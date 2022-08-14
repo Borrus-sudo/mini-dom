@@ -2,7 +2,7 @@
 
 # 🤏 mini-dom
 
-This is created as a part of the project ![tinypages](https://github.com/Borrus-sudo/tinypages) which you should definitely checkout!
+This is created as a part of the project [tinypages](https://github.com/Borrus-sudo/tinypages) which you should definitely checkout!
 
 [![All Contributors](https://img.shields.io/github/contributors/Borrus-sudo/mini-dom?color=orange)](#contributors-)
 ![License](https://img.shields.io/github/license/Borrus-sudo/mini-dom?label=License)
