@@ -1,7 +1,9 @@
 {
-  "name": "ts-lib-starter",
+  "name": "mini-dom",
   "version": "1.0.0",
+  "description": "A little utility for tinypages",
   "license": "MIT",
+  "homepage": "https://github.com/Borrus-sudo/mini-dom",
   "scripts": {
     "test": "vitest",
     "coverage": "vitest --coverage",
@@ -38,5 +40,8 @@
     "tsup": "^5.10.3",
     "typescript": "^4.5.3",
     "vitest": "^0.14.1"
+  },
+  "dependencies": {
+    "ohash": "^0.1.5"
   }
 }

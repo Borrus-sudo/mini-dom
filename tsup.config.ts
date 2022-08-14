@@ -1,4 +1,4 @@
-import { Options } from "tsup"
+import { Options } from "tsup";
 
 const config: Options = {
   splitting: true,
@@ -6,7 +6,8 @@ const config: Options = {
   entryPoints: ["lib/index.ts"],
   clean: true,
   dts: true,
+  minify: true,
   outDir: "./out",
-}
+};
 
-export default config
+export default config;

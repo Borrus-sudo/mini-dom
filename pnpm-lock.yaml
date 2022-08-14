@@ -1,4 +1,4 @@
-lockfileVersion: 5.4
+lockfileVersion: 5.3
 
 specifiers:
   '@commitlint/cli': ^15.0.0
@@ -7,10 +7,14 @@ specifiers:
   c8: ^7.11.3
   husky: ^7.0.0
   lint-staged: ^12.1.2
+  ohash: ^0.1.5
   prettier: ^2.5.1
   tsup: ^5.10.3
   typescript: ^4.5.3
   vitest: ^0.14.1
+
+dependencies:
+  ohash: 0.1.5
 
 devDependencies:
   '@commitlint/cli': 15.0.0
@@ -120,7 +124,7 @@ packages:
       '@commitlint/execute-rule': 15.0.0
       '@commitlint/resolve-extends': 15.0.0
       '@commitlint/types': 15.0.0
-      '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2_ogrpmgle4n5e22g2w3nn2kuzua
+      '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2_71a2f61964e37a4d68dab6dadd2a99a0
       chalk: 4.1.2
       cosmiconfig: 7.0.1
       lodash: 4.17.21
@@ -192,7 +196,7 @@ packages:
       chalk: 4.1.2
     dev: true
 
-  /@endemolshinegroup/cosmiconfig-typescript-loader/3.0.2_ogrpmgle4n5e22g2w3nn2kuzua:
+  /@endemolshinegroup/cosmiconfig-typescript-loader/3.0.2_71a2f61964e37a4d68dab6dadd2a99a0:
     resolution: {integrity: sha512-QRVtqJuS1mcT56oHpVegkKBlgtWjXw/gHNWO3eL9oyB5Sc7HBoc2OLG/nYpVfT/Jejvo3NUrD0Udk7XgoyDKkA==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
@@ -1734,6 +1738,10 @@ packages:
   /object-inspect/1.11.1:
     resolution: {integrity: sha512-If7BjFlpkzzBeV1cqgT3OSWT3azyoxDGajR+iGnFBfVV2EWyDyWaZZW2ERDjUaY2QM8i5jI3Sj7mhsM4DDAqWA==}
     dev: true
+
+  /ohash/0.1.5:
+    resolution: {integrity: sha512-qynly1AFIpGWEAW88p6DhMNqok/Swb52/KsiU+Toi7er058Ptvno3tkfTML6wYcEgFgp2GsUziW4Nqn62ciuyw==}
+    dev: false
 
   /once/1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}

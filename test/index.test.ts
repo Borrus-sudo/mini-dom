@@ -1,8 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { helloWorld } from "../lib/index";
+import { Parser } from "../lib/index";
 
 describe("it should pass the tests", () => {
-  it("Should print 'Hello World!' from foo, exported from index", () => {
-    expect(helloWorld()).toEqual("Hello World!");
+  const parser = new Parser(" <i-html /> <ThisisAComponent /> <Schema /> ");
+
+  it("It should parse `Icon component`, `ThisIsAComponent` and `Schema` correctly and replace them appropriately", async () => {
+    const generator = parser.parse();
+    generator.next();
+    generator.next("Crappy Iconse");
+    generator.next("crapp component");
+    const lastVal = generator.next();
+    if (lastVal.done) {
+      expect(lastVal.value).toBe("Crappy Iconse crapp component");
+    }
   });
 });

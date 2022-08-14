@@ -1,20 +1,15 @@
 <!-- DO NOT REMOVE - contributor_list:data:start:["Borrus-sudo", "JacobMGEvans", "dependabot[bot]"]:end -->
 
-# ⚖ ts-lib-starter
+# 🤏 mini-dom
 
-[![All Contributors](https://img.shields.io/github/contributors/Borrus-sudo/ts-lib-starter?color=orange)](#contributors-)
-![License](https://img.shields.io/github/license/Borrus-sudo/ts-lib-starter?label=License)
-![Last Commit](https://img.shields.io/github/last-commit/Borrus-sudo/ts-lib-starter?label=Last%20Commit)
-![Stars](https://img.shields.io/github/stars/Borrus-sudo/ts-lib-starter)
-![Forks](https://img.shields.io/github/forks/Borrus-sudo/ts-lib-starter)
+This is created as a part of the project ![tinypages](https://github.com/Borrus-sudo/tinypages) which you should definitely checkout!
 
-## 🎩 Features
+[![All Contributors](https://img.shields.io/github/contributors/Borrus-sudo/mini-dom?color=orange)](#contributors-)
+![License](https://img.shields.io/github/license/Borrus-sudo/mini-dom?label=License)
+![Last Commit](https://img.shields.io/github/last-commit/Borrus-sudo/mini-dom?label=Last%20Commit)
+![Stars](https://img.shields.io/github/stars/Borrus-sudo/mini-dom)
+![Forks](https://img.shields.io/github/forks/Borrus-sudo/mini-dom)
 
-- Preconfigured git hooks to prettify your staged files and check your commit messages using commit-lint.
-- Uses tsup for building files.
-- `vitest` and `c8` (coverage) are preconfigured right out of the box!
-- Has a contributor-list Github action configured by default!
-- Uses pnpmJS as its pkg manager by default!
 
 ## 🎉 Contributing
 

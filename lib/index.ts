@@ -1,4 +1,1 @@
-import helloWorld from "./foo";
-helloWorld();
-
-export { helloWorld };
+export { Parser } from "./parser";
