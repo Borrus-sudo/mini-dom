@@ -1,137 +1,140 @@
 import { handlePropsParse, midReplace } from "./utils";
-import { murmurHash } from "ohash";
+import { objectHash, murmurHash } from "ohash";
 
-enum Delimiters {
-  "opening_tag_start" = "<",
-  "closing_tag_short_end" = "/>",
-}
-
-interface Return {
-  type: "icon" | "component" | "schema";
+interface ParseType {
   name: string;
   props: Record<string, any>;
+  children?: string;
   hash: string;
 }
+export function* Parse(
+  html: string,
+  selector: RegExp,
+): Generator<ParseType, string, string> {
+  let currIdx = -1;
+  function incrementIdx() {
+    currIdx++;
+  }
+  function readNextChar() {
+    return html.charAt(currIdx);
+  }
+  function readUntil(test: RegExp) {
+    let result = "";
+    while (readSourceAvailable()) {
+      incrementIdx();
+      const token = readNextChar();
+      if (test.test(readNextChar())) {
+        currIdx--;
+        return result;
+      } else {
+        result += token;
+      }
+    }
+  }
+  function readSourceAvailable() {
+    // since we increment first and then read
+    return currIdx + 1 !== html.length;
+  }
 
-export class Parser {
-  private html: string;
-  private currIdx: number = 0;
-  constructor(_html) {
-    this.html = _html;
-  }
-  private readUntil(until: string) {
-    const uptillIdx = this.html.indexOf(until, this.currIdx);
-    const result = this.html.slice(this.currIdx, uptillIdx + until.length);
-    this.currIdx = uptillIdx + until.length;
-    return result;
-  }
-  private read() {
-    this.currIdx += 1;
-    return this.html.charAt(this.currIdx - 1);
-  }
-  private readSourceAvailable() {
-    return this.currIdx !== this.html.length;
-  }
-  *parse(): Generator<Return, string, string> {
-    function parseTHEProps(
-      component_name,
-      hashNeeded: boolean = false,
-    ): [Object, string] {
-      const key_value_pair = this.readUntil(
-        Delimiters.closing_tag_short_end,
-      ).trim();
-      let props = {};
-      let pair = "";
-      for (let char of key_value_pair) {
-        if (char === " ") {
-          if (pair) {
-            pair = "";
-            // construct the key and value
-            let [key, value] = pair.trim().split("=");
-            value = value.slice(1, -1);
-            if (key.startsWith(":")) {
-              key = key.slice(1);
-              value = handlePropsParse(value, key, component_name);
-            }
-            props[key] = value;
-          }
-          continue;
+  function parseElementHeader(elemName: string): [Object, boolean] {
+    let props = {};
+    let key = "";
+    while (readSourceAvailable()) {
+      incrementIdx();
+      const nextChar = readNextChar();
+      if (nextChar === "/") {
+        incrementIdx();
+        if (readNextChar() === ">") {
+          return [props, true];
+        }
+      } else if (nextChar === "=" && html.charAt(currIdx + 1) === '"') {
+        incrementIdx(); // to skip the starting quote
+        const value = readUntil(/\"/);
+        if (key.startsWith(":")) {
+          props[key.slice(1)] = handlePropsParse(value, key, elemName);
         } else {
-          pair += char;
+          props[key] = value;
         }
-      }
-      return [
-        props,
-        hashNeeded
-          ? murmurHash(component_name + key_value_pair).toString()
-          : "",
-      ];
-    }
-    const parseProps = parseTHEProps.bind(this);
-    while (this.readSourceAvailable()) {
-      const char = this.read();
-      // maybe a custom component
-      if (char === Delimiters.opening_tag_start) {
-        const startingIndex = this.currIdx - 1;
-        const firstLetterOfComponent = this.read();
-        const component_name =
-          firstLetterOfComponent + this.readUntil(" ").trim();
-
-        /**
-         * Schema component
-         */
-        if (component_name.startsWith("Schema")) {
-          let [props] = parseProps(component_name);
-          yield {
-            type: "schema",
-            name: component_name.split("Schema")[1],
-            props,
-            hash: "",
-          };
-          const endingIndex = this.currIdx;
-          this.currIdx = startingIndex + 1;
-          this.html = midReplace(startingIndex, endingIndex, this.html, "");
-          /**
-           * User Component
-           */
-        } else if (/^[A-Z]/.test(component_name)) {
-          let [props, hash] = parseProps(component_name, true);
-          const renderedValue = yield {
-            type: "component",
-            name: component_name,
-            props,
-            hash,
-          };
-          const endingIndex = this.currIdx;
-          this.currIdx = startingIndex + renderedValue.length - 1;
-          this.html = midReplace(
-            startingIndex,
-            endingIndex,
-            this.html,
-            renderedValue,
-          );
-          /**
-           * Icon component
-           */
-        } else if (component_name.startsWith("i-")) {
-          let [props] = parseProps(component_name);
-          const renderedValue: string = yield {
-            type: "icon",
-            name: component_name,
-            props,
-            hash: "",
-          };
-          const endingIndex = this.currIdx;
-          this.currIdx = startingIndex + renderedValue.length - 1;
-          this.html = midReplace(
-            startingIndex,
-            endingIndex,
-            this.html,
-            renderedValue,
-          );
-        }
+        incrementIdx(); // since we are aware that quote is gonna be the next char
+      } else if (nextChar === ">") {
+        return [props, false];
       }
     }
-    return this.html.trim();
   }
+
+  function replaceResultAndUpdateIdxAccordingly(startingIdx, renderedValue) {
+    const endingIndex = currIdx;
+    currIdx = startingIdx + renderedValue.length; // cause of the way we update
+    html = midReplace(startingIdx, endingIndex, html, renderedValue);
+  }
+
+  interface Component {
+    name: string;
+    hash: string;
+    props: Object;
+    startIdx: number;
+  }
+  const store: Map<string, Component[]> = new Map();
+
+  function updateStore(compInfo: Component) {
+    if (store.has(compInfo.name)) {
+      store.set(compInfo.name, store.get(compInfo.name).concat([compInfo]));
+    } else {
+      store.set(compInfo.name, [compInfo]);
+    }
+  }
+
+  function retrieveFromStore(elemName: string) {
+    return store.get(elemName).pop();
+  }
+
+  while (readSourceAvailable()) {
+    incrementIdx();
+    const token = readNextChar();
+    if (token === "<") {
+      const startIdx = currIdx;
+      const elementName = readUntil(/ |\//);
+      if (selector.test(elementName)) {
+        let props, shortend;
+        if (html.charAt(currIdx + 1) === "/") {
+          // resolve this edge case
+          [props, shortend] = parseElementHeader(elementName);
+          incrementIdx(); // important
+        } else {
+          [props, shortend] = [{}, true];
+        }
+        const hash = murmurHash(
+          objectHash({ props, name: elementName }),
+        ).toString();
+        if (shortend) {
+          const result = yield { props, name: elementName, hash };
+          replaceResultAndUpdateIdxAccordingly(startIdx, result);
+        } else {
+          updateStore({ name: elementName, props, startIdx, hash });
+        }
+      }
+    } else if (token === "<") {
+      incrementIdx();
+      const nextToken = readNextChar();
+      if (nextToken === "/") {
+        const elemName = readUntil(/\>/);
+        if (store.has(elemName)) {
+          incrementIdx(); // so that replaceResult func picks up the end idx correctly
+          const compInfo = retrieveFromStore(elemName);
+          const children = html.slice(
+            compInfo.startIdx,
+            currIdx - (3 + elemName.length),
+          );
+          const result = yield {
+            name: compInfo.name,
+            props: compInfo.props,
+            hash: compInfo.hash,
+            children,
+          };
+          replaceResultAndUpdateIdxAccordingly(compInfo.startIdx, result);
+        }
+      }
+    }
+  }
+  return html;
 }
